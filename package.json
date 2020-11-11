@@ -1,0 +1,18 @@
+{
+  "name": "steves-guitar-shop",
+  "version": "1.0.0",
+  "description": "API for steve's guitar shop",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Steve Pierzchala",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Stephen-Pierzchala/steves-guitars-api.git"
+  },
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
