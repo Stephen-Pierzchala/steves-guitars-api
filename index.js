@@ -1,23 +1,20 @@
 // Imports
 const express = require("express");
 const dotenv = require("dotenv").config();
-const { Sequelize } = require("sequelize");
 const app = express();
-
 const port = process.env.PORT || 8080;
-console.log(process.env.DB_CONNECTION_STRING);
 
+const sequelize = require("./database/db");
 //test connection to database
-const sequelize = new Sequelize(process.env.DB_CONNECTION_STRING); // Example for postgres
-const testDB = async () => {
-	try {
-		await sequelize.authenticate();
+sequelize
+	.authenticate()
+	.then(() => {
 		console.log("Connected to database!");
-	} catch (error) {
-		console.error("Unable to connect to the database:", error);
-	}
-};
-testDB();
+	})
+	.catch((err) => {
+		console.log("Unable to connect to the database: \n", err);
+		process.exit(-1);
+	});
 
 //declare api routes
 app.get("/", (req, res) => {
@@ -35,6 +32,16 @@ app.use("/api/v1/auth", authRouter);
 const productRouter = require("./routers/productRouter");
 app.use("/api/v1/products", productRouter);
 
+sequelize.sync({ force: true }).then(() => {
+	console.log("All models were synchronized successfully.\n");
+	const dataGenerator = require("./database/generateData");
+	dataGenerator.genereateDummyData().then(() => {
+		console.log("...done.");
+	});
+});
+
 app.listen(port, () => {
-	console.log(`WELCOME :: STEVE'S SERVER LISTENING AT PORT ${port}`);
+	console.log(
+		`WELCOME :: STEVE'S GUITAR SHOP API SERVER LISTENING AT PORT ${port}`
+	);
 });
