@@ -32,10 +32,15 @@ app.use("/api/v1/auth", authRouter);
 const productRouter = require("./routers/productRouter");
 app.use("/api/v1/products", productRouter);
 
+//Cart Routes (Add/remove from cart)
+const cartRouter = require("./routers/cartRouter");
+app.use("/api/v1/cart", cartRouter);
+
 //ensure that the models are in sync with the actual postgres DB
 sequelize
 	.sync({
-		force: process.env.DB_FORCE == true,
+		force: process.env.DB_FORCE == "true",
+		alter: process.env.DB_ALTER == "true",
 	})
 	.then(() => {
 		console.log("All models were synchronized successfully.\n");

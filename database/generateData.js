@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const Product = require("../models/Product");
+// const CartItem = require("../models/CartItem");
 
 const genereateDummyData = async () => {
 	//Generate basic dummy data
@@ -16,7 +17,7 @@ const genereateDummyData = async () => {
 		name: "Classical Guitar",
 		price: 499,
 		description:
-			"A classical guitar with nylon strings perferct for guitar arrangements of orchestral pieces.",
+			"A classical guitar with nylon strings perfect for guitar arrangements of orchestral pieces.",
 		rating: 4,
 		type: "Acoustic",
 		imageLink:
