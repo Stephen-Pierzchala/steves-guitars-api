@@ -27,8 +27,13 @@ app.use("/api/v1/test", (req, res, next) => {
 	res.send({ status: "OK" });
 });
 
-const authRouter = require("./routers/AuthRouter");
+//Authentication routes (Login/Register)
+const authRouter = require("./routers/authRouter");
 app.use("/api/v1/auth", authRouter);
+
+//Product routes (CRUD)
+const productRouter = require("./routers/productRouter");
+app.use("/api/v1/products", productRouter);
 
 app.listen(port, () => {
 	console.log(`WELCOME :: STEVE'S SERVER LISTENING AT PORT ${port}`);
