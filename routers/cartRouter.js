@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const cartController = require("../controllers/authentication/auth");
+const cartController = require("../controllers/cartItem/cartItem");
 
 router.get("", (req, res) => {
 	res.json({ status: "Working!" });
