@@ -16,4 +16,4 @@ Product.hasMany(CartItem, {
 });
 CartItem.belongsTo(Product);
 
-module.exports = { CartItem };
+module.exports = CartItem;

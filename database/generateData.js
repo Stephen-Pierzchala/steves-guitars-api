@@ -1,6 +1,6 @@
 const User = require("../models/User");
 const Product = require("../models/Product");
-// const CartItem = require("../models/CartItem");
+const CartItem = require("../models/CartItem");
 
 const genereateDummyData = async () => {
 	//Generate basic dummy data
@@ -66,6 +66,11 @@ const genereateDummyData = async () => {
 		type: "Acoustic",
 		imageLink:
 			"https://images.unsplash.com/photo-1583255670343-a7a92d53d6e7?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1100&q=80",
+	});
+
+	const cartItem1 = await CartItem.create({
+		UserId: 1,
+		ProductId: 1,
 	});
 };
 
