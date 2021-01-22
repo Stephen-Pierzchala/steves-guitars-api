@@ -25,6 +25,7 @@ app.use("/api/v1/test", (req, res, next) => {
 });
 
 //Authentication routes (Login/Register)
+require("routers/");
 const authRouter = require("./routers/authRouter");
 app.use("/api/v1/auth", authRouter);
 
