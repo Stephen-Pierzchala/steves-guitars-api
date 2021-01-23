@@ -1,4 +1,6 @@
 const jwt = require("jsonwebtoken");
+const User = require("../../models/User");
+const passwordUtil = require("./encrypt");
 
 //LOGIN
 // The user logs in with a login API call.
@@ -40,12 +42,27 @@ const register = (req, res) => {
 
 //Request an access token from the server
 const logIn = async (req, res) => {
-	console.log("Log in function called.");
+	const { email, password } = req.body;
+
+	if (!email || !password)
+		res.send("Error: Please provide email and password.");
+
+	const user = await User.findOne({
+		where: { email: email },
+	});
+
+	if (!user) res.send("Error: No User found with these credentials");
+	if ((await passwordUtil.checkPassword(password, user.password)) == false) {
+		res.send("Error: Invalid password");
+	} else {
+		res.send("Login Success!");
+	}
 };
 
 //Request a new access token using a refresh token
 const refresh = (username) => {
-	console.log("logout function called.");
+	console.log("refresh function called.");
+	res.send("called refresh function");
 };
 
 //change the refresh token for a specific user
