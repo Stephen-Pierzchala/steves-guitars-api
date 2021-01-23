@@ -34,10 +34,28 @@ const passwordUtil = require("./encrypt");
 // }, 3000);
 
 //create an account
-const register = (req, res) => {
-	console.log("register function called.");
-	res.send("Called register function");
-	// res.status(200).json({ status: "called register function successfully" });
+const register = async (req, res) => {
+	const { email, password, confirmPassword } = req.body;
+
+	if (!email || !password || !confirmPassword) {
+		res.send("Error: Please provide all input fields");
+		return;
+	} else if (password !== confirmPassword) {
+		res.send("Error: passwords do not match");
+		return;
+	}
+
+	const [user, created] = await User.findOrCreate({
+		where: { email: email },
+		defaults: { password: await passwordUtil.hashPassword(password) },
+	});
+	if (!created) {
+		res.send("Email Already In Use.");
+		return;
+	} else {
+		res.send("Success!");
+		return;
+	}
 };
 
 //Request an access token from the server
@@ -54,8 +72,10 @@ const logIn = async (req, res) => {
 	if (!user) res.send("Error: No User found with these credentials");
 	if ((await passwordUtil.checkPassword(password, user.password)) == false) {
 		res.send("Error: Invalid password");
+		return;
 	} else {
 		res.send("Login Success!");
+		return;
 	}
 };
 
