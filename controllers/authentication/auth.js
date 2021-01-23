@@ -37,11 +37,33 @@ const passwordUtil = require("./encrypt");
 const register = async (req, res) => {
 	const { email, password, confirmPassword } = req.body;
 
-	if (!email || !password || !confirmPassword) {
-		res.send("Error: Please provide all input fields");
+	if (!email) {
+		res.status(400).json({
+			email: true,
+			errorText: "Please Provide An Email",
+		});
 		return;
-	} else if (password !== confirmPassword) {
-		res.send("Error: passwords do not match");
+	}
+	if (!password) {
+		res.status(400).json({
+			password: true,
+			errorText: "Please Provide A Password",
+		});
+		return;
+	}
+	if (!confirmPassword) {
+		res.status(400).json({
+			confirmPassword: true,
+			errorText: "Please Provide A Cofirmed Password",
+		});
+		return;
+	}
+	if (password !== confirmPassword) {
+		res.status(400).json({
+			confirmPassword: true,
+			password: true,
+			errorText: "Please Ensure Passwords Match",
+		});
 		return;
 	}
 
@@ -50,10 +72,13 @@ const register = async (req, res) => {
 		defaults: { password: await passwordUtil.hashPassword(password) },
 	});
 	if (!created) {
-		res.send("Email Already In Use.");
+		res.status(401).json({
+			errorText: "Email is already in use.",
+			email: true,
+		});
 		return;
 	} else {
-		res.send("Success!");
+		res.status(200).json({ message: "Success!" });
 		return;
 	}
 };
@@ -62,19 +87,43 @@ const register = async (req, res) => {
 const logIn = async (req, res) => {
 	const { email, password } = req.body;
 
-	if (!email || !password)
-		res.send("Error: Please provide email and password.");
+	// res.status(200).json({ success: false, errorText: "There was an error" });
+	// return;
+
+	if (!email) {
+		res.status(400).json({
+			email: true,
+			errorText: "Please Provide An Email",
+		});
+	}
+	if (!password) {
+		res.status(400).json({
+			password: true,
+			errorText: "Please Provide An Email",
+		});
+	}
 
 	const user = await User.findOne({
 		where: { email: email },
 	});
 
-	if (!user) res.send("Error: No User found with these credentials");
-	if ((await passwordUtil.checkPassword(password, user.password)) == false) {
-		res.send("Error: Invalid password");
+	if (!user) {
+		res.status(401).json({
+			errorText: "Error: No User found with these credentials",
+			email: true,
+			password: true,
+		});
+		return;
+	} else if (
+		(await passwordUtil.checkPassword(password, user.password)) == false
+	) {
+		res.status(401).json({
+			errorText: "Error: Invalid password",
+			password: true,
+		});
 		return;
 	} else {
-		res.send("Login Success!");
+		res.status(200).json({ message: "Login Success!" });
 		return;
 	}
 };
