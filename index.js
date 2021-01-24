@@ -3,6 +3,7 @@ const express = require("express");
 const dotenv = require("dotenv").config();
 const port = process.env.PORT || 8080;
 const bodyParser = require("body-parser");
+const authTool = require("./controllers/authentication/auth");
 
 const app = express();
 
@@ -29,6 +30,10 @@ app.get("/", (req, res) => {
 });
 app.use("/api/v1/test", (req, res, next) => {
 	res.send({ status: "OK" });
+});
+
+app.post("/api/v1/tokenTest", authTool.validateToken, (req, res, next) => {
+	res.send({ status: "this is protected!" });
 });
 
 //Authentication routes (Login/Register)

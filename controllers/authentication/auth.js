@@ -142,6 +142,16 @@ const refresh = (username) => {
 	res.send("called refresh function");
 };
 
-const validateToken = (res, res, next) => {};
+//This will be placed in front of all routes that require authentication
+const validateToken = (req, res, next) => {
+	const token = req.body.token;
+
+	jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+		if (err) {
+			res.status(401).json(err);
+			return;
+		} else next();
+	});
+};
 
 module.exports = { logIn, refresh, register, validateToken };
