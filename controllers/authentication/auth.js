@@ -78,7 +78,7 @@ const register = async (req, res) => {
 		});
 		return;
 	} else {
-		res.status(200).json({ message: "Success!" });
+		res.status(200).json({ message: "Success! Redirect to Login Page." });
 		return;
 	}
 };
@@ -123,7 +123,15 @@ const logIn = async (req, res) => {
 		});
 		return;
 	} else {
-		res.status(200).json({ message: "Login Success!" });
+		const token = jwt.sign(
+			{ email: email },
+			process.env.ACCESS_TOKEN_SECRET,
+			{ expiresIn: "30s" }
+		);
+		res.status(200).json({
+			message: "Login Success!",
+			token: token,
+		});
 		return;
 	}
 };
@@ -134,10 +142,6 @@ const refresh = (username) => {
 	res.send("called refresh function");
 };
 
-//change the refresh token for a specific user
-// -- This means that after the current access token expires user will be logged out automatically.
-const logOut = () => {
-	console.log("logout function called.");
-};
+const validateToken = (res, res, next) => {};
 
-module.exports = { logIn, refresh, register, logOut };
+module.exports = { logIn, refresh, register, validateToken };
