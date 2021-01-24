@@ -1,4 +1,6 @@
 const jwt = require("jsonwebtoken");
+const User = require("../../models/User");
+const passwordUtil = require("./encrypt");
 
 //LOGIN
 // The user logs in with a login API call.
@@ -32,26 +34,124 @@ const jwt = require("jsonwebtoken");
 // }, 3000);
 
 //create an account
-const register = (req, res) => {
-	console.log("register function called.");
-	res.send("Called register function");
-	// res.status(200).json({ status: "called register function successfully" });
+const register = async (req, res) => {
+	const { email, password, confirmPassword } = req.body;
+
+	if (!email) {
+		res.status(400).json({
+			email: true,
+			errorText: "Please Provide An Email",
+		});
+		return;
+	}
+	if (!password) {
+		res.status(400).json({
+			password: true,
+			errorText: "Please Provide A Password",
+		});
+		return;
+	}
+	if (!confirmPassword) {
+		res.status(400).json({
+			confirmPassword: true,
+			errorText: "Please Provide A Cofirmed Password",
+		});
+		return;
+	}
+	if (password !== confirmPassword) {
+		res.status(400).json({
+			confirmPassword: true,
+			password: true,
+			errorText: "Please Ensure Passwords Match",
+		});
+		return;
+	}
+
+	const [user, created] = await User.findOrCreate({
+		where: { email: email },
+		defaults: { password: await passwordUtil.hashPassword(password) },
+	});
+	if (!created) {
+		res.status(401).json({
+			errorText: "Email is already in use.",
+			email: true,
+		});
+		return;
+	} else {
+		res.status(200).json({ message: "Success! Redirect to Login Page." });
+		return;
+	}
 };
 
 //Request an access token from the server
 const logIn = async (req, res) => {
-	console.log("Log in function called.");
+	const { email, password } = req.body;
+
+	// res.status(200).json({ success: false, errorText: "There was an error" });
+	// return;
+
+	if (!email) {
+		res.status(400).json({
+			email: true,
+			errorText: "Please Provide An Email",
+		});
+	}
+	if (!password) {
+		res.status(400).json({
+			password: true,
+			errorText: "Please Provide An Email",
+		});
+	}
+
+	const user = await User.findOne({
+		where: { email: email },
+	});
+
+	if (!user) {
+		res.status(401).json({
+			errorText: "Error: No User found with these credentials",
+			email: true,
+			password: true,
+		});
+		return;
+	} else if (
+		(await passwordUtil.checkPassword(password, user.password)) == false
+	) {
+		res.status(401).json({
+			errorText: "Error: Invalid password",
+			password: true,
+		});
+		return;
+	} else {
+		const token = jwt.sign(
+			{ email: email },
+			process.env.ACCESS_TOKEN_SECRET,
+			{ expiresIn: "30s" }
+		);
+		res.status(200).json({
+			message: "Login Success!",
+			token: token,
+		});
+		return;
+	}
 };
 
 //Request a new access token using a refresh token
 const refresh = (username) => {
-	console.log("logout function called.");
+	console.log("refresh function called.");
+	res.send("called refresh function");
 };
 
-//change the refresh token for a specific user
-// -- This means that after the current access token expires user will be logged out automatically.
-const logOut = () => {
-	console.log("logout function called.");
+//This will be placed in front of all routes that require authentication
+const validateToken = (req, res, next) => {
+	const token = req.body.token;
+
+	jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+		if (err) {
+			res.status(401).json(err);
+			return;
+		} else next();
+	});
 };
 
-module.exports = { logIn, refresh, register, logOut };
+module.exports = { logIn, refresh, register, validateToken };

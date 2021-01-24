@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const Product = require("../models/Product");
 const CartItem = require("../models/CartItem");
+const passwordUtil = require("../controllers/authentication/encrypt");
 
 const genereateDummyData = async () => {
 	//Generate basic dummy data
@@ -10,7 +11,7 @@ const genereateDummyData = async () => {
 		firstName: "Steve",
 		lastName: "Pierzchala",
 		email: "pierzchalastephen@gmail.com",
-		password: "hunter2",
+		password: await passwordUtil.hashPassword("hunter2"),
 	});
 
 	const product1 = await Product.create({

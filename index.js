@@ -1,8 +1,16 @@
 // Imports
 const express = require("express");
 const dotenv = require("dotenv").config();
-const app = express();
 const port = process.env.PORT || 8080;
+const bodyParser = require("body-parser");
+const authTool = require("./controllers/authentication/auth");
+
+const app = express();
+
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }));
+// parse application/json
+app.use(bodyParser.json());
 
 const sequelize = require("./database/db");
 //test connection to database
@@ -22,6 +30,10 @@ app.get("/", (req, res) => {
 });
 app.use("/api/v1/test", (req, res, next) => {
 	res.send({ status: "OK" });
+});
+
+app.post("/api/v1/tokenTest", authTool.validateToken, (req, res, next) => {
+	res.send({ status: "this is protected!" });
 });
 
 //Authentication routes (Login/Register)
